@@ -4,10 +4,15 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
 using Random = UnityEngine.Random;
+using System.Collections;
+using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
-    public Canvas loseCanvas;
+    public Canvas failCanvas;
+
+    public AudioSource failSound;
 
     public Canvas infoCanvas;
 
@@ -16,6 +21,10 @@ public class GameController : MonoBehaviour
     public TextMeshProUGUI targetNameText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI livesText;
+    public TextMeshProUGUI timerText;
+    public TextMeshProUGUI targetFoundText;
+
+    public TextMeshProUGUI failText;
 
     private List<string> opcionesBuscar = new List<string>()
     {
@@ -25,60 +34,81 @@ public class GameController : MonoBehaviour
     //ya no bajan aun acertando (fallo de los nombres ingles-español)
     public int vidas = 3;
     //ahora suben correctamente (fallo de los nombres ingles-español)
-    private int puntuacion = 0;
+    public int puntuacion = 0;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    void Awake()
+    {
+        failCanvas.gameObject.SetActive(false);
+    }
+
     void Start()
     {
         Debug.Log("Victor: start");
         generaSiguienteTarget();
         Debug.Log("Victor: antes UI");
         ActualizaUI();
+
     }
 
-    void ActualizaUI()
+    public void ActualizaUI()
     {
         Debug.Log("Victor: Actualiza UI");
         targetNameText.text = "Busca " + targetABuscar;
         livesText.text = "Tienes " + vidas + " vidas.";
         scoreText.text = "Puntos: " + puntuacion;
-    }
-
-    public void OnTargetFound(String targetReconocido)
-    {
-
-        Debug.Log("Victor: " + targetReconocido + " " + targetABuscar);
- 
-        if (targetReconocido == targetABuscar)
-        {
-            //El jugador acierta
-            
-            puntuacion++;
-            generaSiguienteTarget();
-        }
-        else
-        {
-            //No ha acertado. Ha escaneado otra imagen
-            vidas--;
-            Debug.Log("Victor: Decremento vidas= " + vidas);
-            if (vidas == 0)
-            {
-                //GameOver
-                GameOver();
-            }
-        }
-
-        if (vidas >= 15)
+       
+        if (puntuacion >= 15)
         {
 
             WinScreen();
 
         }
 
-        ActualizaUI();
+        if (vidas <= 0)
+        {
 
+            GameOver();
+
+        }
     }
 
-    void generaSiguienteTarget()
+    public void OnTargetFound(String targetReconocido)
+    {
+        Debug.Log("Victor: " + targetReconocido + " " + targetABuscar);
+
+        if (targetReconocido == targetABuscar)
+        {
+            failCanvas.gameObject.SetActive(false);
+            //El jugador acierta
+            targetFoundText.text = targetReconocido;
+            puntuacion++;
+            generaSiguienteTarget();
+
+
+        }
+
+        else
+        {
+            //No ha acertado. Ha escaneado otra imagen
+            vidas--;
+            failCanvas.gameObject.SetActive(true);
+            failText.text = $"Has escaneado {targetReconocido}, necesitas encontrar: {targetABuscar}";
+            targetFoundText.text = targetReconocido;
+            Debug.Log("Victor: Decremento vidas= " + vidas);
+            //SIEMPRE QUE SE QUIERA REPRODUCIR UN SONIDO HAY QUE INICIAR CON UNA CORUTINA
+            StartCoroutine(ReproducirSonidoFallo());
+            StartCoroutine(CambioDeVidasTimer());
+            
+         
+        }
+        
+        ActualizaUI();
+    }
+
+    public void generaSiguienteTarget()
     {
         Debug.Log("Victor: siguiente target");
         int posAleatoria = Random.Range(0, opcionesBuscar.Count);
@@ -87,38 +117,50 @@ public class GameController : MonoBehaviour
 
     void GameOver()
     {
-        HideInfo();
-        Lose();
-        targetNameText.text = "Gameover";
-
-        if (targetNameText.text == "Gameover")
+        if (vidas <= 0)
         {
-            Debug.Log("se deberia cambiar el Target por Gameover");
+            Debug.Log("Victor: Game Over");
+            DataThroughScenes.instance.haPerdido = true;
+            HideInfo();
         }
     }
+
+    private IEnumerator ReproducirSonidoFallo()
+    {
+        failSound.Play();
+        yield return new WaitForSeconds(3);
+
+    }
+    
+    private IEnumerator CambioDeVidasTimer()
+    {
+        if(Timer.timer.targetTime <= 0f)
+        {
+            vidas -= 1;
+            ActualizaUI();
+        }
+
+
+        yield return new WaitForSeconds(1);
+    }
+        
 
     void WinScreen()
     {
+        DataThroughScenes.instance.haPerdido = false;
+        Debug.Log("Victor: Has ganado");
         HideInfo();
-        targetNameText.text = "Has ganado";
-    }
-
-    public void Lose()
-    {
-        Debug.Log("Victor: entrada a la funcion Lose");
-        if (vidas <= 0)
-        {
-            Debug.Log("Victor: Se detectó que no hay vidas");
-            loseCanvas.gameObject.SetActive(true);
-        }
     }
     public void HideInfo()
     {
         Debug.Log("Victor: Entrada a la funcion HideInfo");
         if (vidas <= 0)
         {   
-            Debug.Log("Victor: Se detectó que no hay vidas");
-            infoCanvas.gameObject.SetActive(true);
+            
+            Debug.Log("Victor: Se detecto que no hay vidas");
+            infoCanvas.gameObject.SetActive(false);
+            failCanvas.gameObject.SetActive(false);
+            SceneManager.LoadScene("Pantalla Final");
         }
     }
 }
