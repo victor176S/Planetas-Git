@@ -60,19 +60,6 @@ public class GameController : MonoBehaviour
         livesText.text = "Tienes " + vidas + " vidas.";
         scoreText.text = "Puntos: " + puntuacion;
        
-        if (puntuacion >= 15)
-        {
-
-            WinScreen();
-
-        }
-
-        if (vidas <= 0)
-        {
-
-            GameOver();
-
-        }
     }
 
     public void OnTargetFound(String targetReconocido)
@@ -87,6 +74,14 @@ public class GameController : MonoBehaviour
             puntuacion++;
             generaSiguienteTarget();
 
+            if (puntuacion >= 15)
+            {
+
+            WinScreen();
+
+            }
+
+
 
         }
 
@@ -100,7 +95,12 @@ public class GameController : MonoBehaviour
             Debug.Log("Victor: Decremento vidas= " + vidas);
             //SIEMPRE QUE SE QUIERA REPRODUCIR UN SONIDO HAY QUE INICIAR CON UNA CORUTINA
             StartCoroutine(ReproducirSonidoFallo());
-            StartCoroutine(CambioDeVidasTimer());
+            if (vidas <= 0)
+            {
+
+            StartCoroutine(GameOver());
+
+            }
             
          
         }
@@ -115,13 +115,14 @@ public class GameController : MonoBehaviour
         targetABuscar = opcionesBuscar[posAleatoria];
     }
 
-    void GameOver()
+    IEnumerator GameOver()
     {
         if (vidas <= 0)
         {
             Debug.Log("Victor: Game Over");
             DataThroughScenes.instance.haPerdido = true;
             HideInfo();
+            yield return new WaitForSeconds(1);
         }
     }
 
@@ -131,25 +132,23 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(3);
 
     }
-    
-    private IEnumerator CambioDeVidasTimer()
+
+   public void QuitarVidas()
     {
-        if(Timer.timer.targetTime <= 0f)
-        {
+    
             vidas -= 1;
             ActualizaUI();
-        }
-
-
-        yield return new WaitForSeconds(1);
+        
     }
         
 
-    void WinScreen()
+    IEnumerator WinScreen()
     {
         DataThroughScenes.instance.haPerdido = false;
         Debug.Log("Victor: Has ganado");
         HideInfo();
+        yield return new WaitForSeconds(1);
+
     }
     public void HideInfo()
     {
