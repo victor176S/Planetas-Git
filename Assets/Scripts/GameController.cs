@@ -72,9 +72,10 @@ public class GameController : MonoBehaviour
             //El jugador acierta
             targetFoundText.text = targetReconocido;
             puntuacion++;
+            targetTime = 15.0f;
             generaSiguienteTarget();
 
-            if (puntuacion >= 15)
+            if (puntuacion >= 5)
             {
 
             WinScreen();
@@ -166,6 +167,13 @@ public class GameController : MonoBehaviour
      void Update(){
 
         targetTime -= Time.deltaTime;
+        DataThroughScenes.puntos = puntuacion;
+
+        if (puntuacion >= 5)
+        {
+            DataThroughScenes.haPerdido = false;
+            SceneManager.LoadScene("Pantalla final");
+        }
         
         if (targetTime <= 0f)
         {

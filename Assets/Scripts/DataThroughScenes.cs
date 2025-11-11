@@ -12,7 +12,7 @@ public class DataThroughScenes : MonoBehaviour
 
     void Awake()
     {
-        puntos = GameController.gameController.puntuacion;
+        
 
         
     }
