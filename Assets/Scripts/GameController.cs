@@ -36,7 +36,7 @@ public class GameController : MonoBehaviour
     //ahora suben correctamente (fallo de los nombres ingles-español)
     public int puntuacion = 0;
 
-
+    public float targetTime = 15.0f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     void Awake()
@@ -120,7 +120,7 @@ public class GameController : MonoBehaviour
         if (vidas <= 0)
         {
             Debug.Log("Victor: Game Over");
-            DataThroughScenes.instance.haPerdido = true;
+            DataThroughScenes.haPerdido = true;
             HideInfo();
             yield return new WaitForSeconds(1);
         }
@@ -144,7 +144,7 @@ public class GameController : MonoBehaviour
 
     IEnumerator WinScreen()
     {
-        DataThroughScenes.instance.haPerdido = false;
+        DataThroughScenes.haPerdido = false;
         Debug.Log("Victor: Has ganado");
         HideInfo();
         yield return new WaitForSeconds(1);
@@ -154,12 +154,39 @@ public class GameController : MonoBehaviour
     {
         Debug.Log("Victor: Entrada a la funcion HideInfo");
         if (vidas <= 0)
-        {   
-            
+        {
+
             Debug.Log("Victor: Se detecto que no hay vidas");
             infoCanvas.gameObject.SetActive(false);
             failCanvas.gameObject.SetActive(false);
-            SceneManager.LoadScene("Pantalla Final");
         }
+    }
+    
+
+     void Update(){
+
+        targetTime -= Time.deltaTime;
+        
+        if (targetTime <= 0f)
+        {
+
+            //aqui no poner lo de las vidas, para el temporizador
+            vidas--;
+            targetTime = 15.0f;
+            ActualizaUI();
+
+            StartCoroutine(GameOver());
+
+            if (vidas <= 0)
+            {
+                DataThroughScenes.haPerdido = true;
+                SceneManager.LoadScene("Pantalla final");
+
+            }
+        }
+        
+
+        timerText.text = "Tiempo: " + Mathf.Round(targetTime).ToString();
+
     }
 }

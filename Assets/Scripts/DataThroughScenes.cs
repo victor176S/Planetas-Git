@@ -4,10 +4,9 @@ using UnityEngine;
 public class DataThroughScenes : MonoBehaviour
 {
     public static DataThroughScenes instance;
-    public string textoFinalString;
-    public TextMeshProUGUI textoFinal;
-    public int puntos = 0;
-    public bool haPerdido;
+    public static string textoFinal;
+    public static int puntos = 0;
+    public static bool haPerdido;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
@@ -15,15 +14,7 @@ public class DataThroughScenes : MonoBehaviour
     {
         puntos = GameController.gameController.puntuacion;
 
-        if (instance != null && instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-
+        
     }
+
 }
