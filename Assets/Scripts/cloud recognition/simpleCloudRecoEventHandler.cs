@@ -1,27 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using Vuforia;
 
-public class PlayerInfo
-{
-    public string link;
-    public string name;
-    public string text;
-
-    public static PlayerInfo CreateFromJSON(string jsonString)
-    {
-        return JsonUtility.FromJson<PlayerInfo>(jsonString);
-    }
-}
 public class simpleCloudRecoEventHandler : MonoBehaviour
 {
-    public PlayerInfo jugador;
-    public string json = "";
-    // Start is called before the first frame update
 
     public ImageTargetBehaviour ImageTargetTemplate;
 
@@ -35,6 +18,7 @@ public class simpleCloudRecoEventHandler : MonoBehaviour
     bool mIsScanning = false;
     string mTargetMetadata = "";
 
+    
     public void generaPlanetaBuscar()
     {
 
@@ -107,57 +91,26 @@ public class simpleCloudRecoEventHandler : MonoBehaviour
         mCloudRecoBehaviour.enabled = false;
 
         if (ImageTargetTemplate)
-        {
-            /* Enable the new result with the same ImageTargetBehaviour: */
-            mCloudRecoBehaviour.EnableObservers(cloudRecoSearchResult, ImageTargetTemplate.gameObject);
-        }
-    }
-
-    void OnGUI()
-    {
-        // Display current 'scanning' status
-        // Display current 'scanning' status
-      GUI.Box (new Rect(100,100,200,50), "Not scanning");
-      // Display metadata of latest detected cloud-target
-      GUI.Box (new Rect(100,200,1000,50), "Nombre : "+jugador.name + "Link : "+jugador.link);
-        // If not scanning, show button
-        // so that user can restart cloud scanning
-        if (!mIsScanning)
-        {
-            if (GUI.Button(new Rect(100, 300, 200, 50), "Restart Scanning"))
             {
-                // Reset Behaviour
-                mCloudRecoBehaviour.enabled = true;
-                mTargetMetadata = "";
+                /* Enable the new result with the same ImageTargetBehaviour: */
+                mCloudRecoBehaviour.EnableObservers(cloudRecoSearchResult, ImageTargetTemplate.gameObject);
             }
+    }
+    
+    void OnGUI() {
+    // Display current 'scanning' status
+    GUI.Box (new Rect(100,100,200,50), mIsScanning ? "Scanning" : "Not scanning");
+    // Display metadata of latest detected cloud-target
+    GUI.Box (new Rect(100,200,200,50), "Metadata: " + mTargetMetadata);
+    // If not scanning, show button
+    // so that user can restart cloud scanning
+    if (!mIsScanning) {
+        if (GUI.Button(new Rect(100,300,200,50), "Restart Scanning")) {
+        // Reset Behaviour
+        mCloudRecoBehaviour.enabled = true;
+        mTargetMetadata="";
         }
     }
-    void Start()
-    {
-
-        TextAsset loadedJsonFile = Resources.Load<TextAsset>("caja");
-        Debug.Log(loadedJsonFile.text);
-        jugador = PlayerInfo.CreateFromJSON(loadedJsonFile.text);
-        //  StartCoroutine(FetchGameObjectFromServer(jugador.link,"jose",0, new Hash128() ));
-        StartCoroutine(GetAssetBundle());
-
-    }
-    IEnumerator GetAssetBundle()
-    {
-        UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(jugador.link);
-        yield return www.SendWebRequest();
-
-        if (www.result != UnityWebRequest.Result.Success) {
-            Debug.Log(www.error);
-        }
-        else {
-            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
-            string[] allAssetNames = bundle.GetAllAssetNames();
-            string gameObjectName = Path.GetFileNameWithoutExtension(allAssetNames[0]).ToString();
-            GameObject objectFound = bundle.LoadAsset(gameObjectName) as GameObject;
-            Instantiate(objectFound,transform.position, transform.rotation);
-            
-        }
-    }
+}
 }
 
