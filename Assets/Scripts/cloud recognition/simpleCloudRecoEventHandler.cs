@@ -1,33 +1,13 @@
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using Vuforia;
 
-public class simpleCloudRecoEventHandler : MonoBehaviour
+public class SimpleCloudRecoEventHandler : MonoBehaviour
 {
-
-    public ImageTargetBehaviour ImageTargetTemplate;
-
-    [SerializeField] TextMeshProUGUI m_Object;
-
-    private List<string> opcionesBuscar = new List<string>()
-    {
-        "Tierra", "Jupiter", "Marte", "Mercurio", "Saturno", "Sol", "Urano", "Venus"
-    };
     CloudRecoBehaviour mCloudRecoBehaviour;
     bool mIsScanning = false;
     string mTargetMetadata = "";
 
-    
-    public void generaPlanetaBuscar()
-    {
-
-        string[] planetas = { "Tierra", "Jupiter", "Marte", "Mercurio", "Saturno", "Sol", "Urano", "Venus" };
-
-        m_Object.text = planetas[Random.Range(0, planetas.Length + 1)];
-
-    }
-
+    public ImageTargetBehaviour ImageTargetTemplate;
 
     // Register cloud reco callbacks
     void Awake()
@@ -49,7 +29,7 @@ public class simpleCloudRecoEventHandler : MonoBehaviour
         mCloudRecoBehaviour.UnregisterOnNewSearchResultEventHandler(OnNewSearchResult);
     }
 
-    public void OnInitialized(CloudRecoBehaviour cloudRecoBehaviour)
+      public void OnInitialized(CloudRecoBehaviour cloudRecoBehaviour)
     {
         Debug.Log("Cloud Reco initialized");
     }
@@ -65,7 +45,7 @@ public class simpleCloudRecoEventHandler : MonoBehaviour
 
     }
 
-    public void OnStateChanged(bool scanning)
+       public void OnStateChanged(bool scanning)
     {
         mIsScanning = scanning;
 
@@ -75,28 +55,22 @@ public class simpleCloudRecoEventHandler : MonoBehaviour
         }
     }
 
-    // Here we handle a cloud target recognition event
-    public void OnNewSearchResult(CloudRecoBehaviour.CloudRecoSearchResult cloudRecoSearchResult)
+     // Here we handle a cloud target recognition event
+    public void OnNewSearchResult(CloudRecoBehaviour.CloudRecoSearchResult cloudRecoSearchResult )
     {
 
-        // Store the target metadata
-        mTargetMetadata = cloudRecoSearchResult.TargetName;
-
-        if (mTargetMetadata == m_Object.text)
+        if (ImageTargetTemplate)
         {
-            m_Object.text = "CORRECTO";
+        /* Enable the new result with the same ImageTargetBehaviour: */
+        mCloudRecoBehaviour.EnableObservers(cloudRecoSearchResult, ImageTargetTemplate.gameObject);
         }
+        // Store the target metadata
+        mTargetMetadata = cloudRecoSearchResult.MetaData;
 
         // Stop the scanning by disabling the behaviour
         mCloudRecoBehaviour.enabled = false;
-
-        if (ImageTargetTemplate)
-            {
-                /* Enable the new result with the same ImageTargetBehaviour: */
-                mCloudRecoBehaviour.EnableObservers(cloudRecoSearchResult, ImageTargetTemplate.gameObject);
-            }
     }
-    
+
     void OnGUI() {
     // Display current 'scanning' status
     GUI.Box (new Rect(100,100,200,50), mIsScanning ? "Scanning" : "Not scanning");
@@ -113,4 +87,3 @@ public class simpleCloudRecoEventHandler : MonoBehaviour
     }
 }
 }
-

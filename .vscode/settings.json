@@ -66,5 +66,5 @@
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj"
     },
-    "dotnet.defaultSolution": "Planetas-Git.sln"
+    "dotnet.defaultSolution": "Planetas-Git1.sln"
 }
