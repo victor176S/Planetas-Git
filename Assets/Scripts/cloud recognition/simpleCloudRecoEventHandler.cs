@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Vuforia;
+using UnityEngine.Networking;
+using System.IO;
 
 //clase para leer el Json, con sus datos, cambiar las variables dependiendo de lo que haya en el Json
 public class metaDatos
@@ -43,7 +45,7 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
 
     void Start()
     {
- 
+        StartCoroutine(GetAssetBundle());
     }
     // Register cloud reco callbacks
     void Awake()
@@ -54,6 +56,23 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
         mCloudRecoBehaviour.RegisterOnUpdateErrorEventHandler(OnUpdateError);
         mCloudRecoBehaviour.RegisterOnStateChangedEventHandler(OnStateChanged);
         mCloudRecoBehaviour.RegisterOnNewSearchResultEventHandler(OnNewSearchResult);
+    }
+
+    IEnumerator GetAssetBundle() {
+        UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(metaDatosVuforia.url);
+        yield return www.SendWebRequest();
+ 
+        if (www.result != UnityWebRequest.Result.Success) {
+            Debug.Log(www.error);
+        }
+        else {
+            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
+            string[] allAssetNames = bundle.GetAllAssetNames();
+            string gameObjectName = Path.GetFileNameWithoutExtension(allAssetNames[0]).ToString();
+            GameObject objectFound = bundle.LoadAsset(gameObjectName) as GameObject;
+            Instantiate(objectFound,transform.position, transform.rotation);
+            
+        }
     }
     //Unregister cloud reco callbacks when the handler is destroyed
     void OnDestroy()
@@ -99,8 +118,7 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
 
         metaDatosVuforia = metaDatos.CreateFromJSON(cloudRecoSearchResult.MetaData);
 
-        
- 
+        StartCoroutine(GetAssetBundle());
 
         // Stop the scanning by disabling the behaviour
         mCloudRecoBehaviour.enabled = false;
