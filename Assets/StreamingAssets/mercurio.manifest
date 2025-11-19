@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.2.6f1
-CRC: 4280479361
+CRC: 628124372
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 9e6b964178705b54517619769142a235
+    Hash: 62bba85fe265edaa419e415305ea0bbe
   TypeTreeHash:
     serializedVersion: 2
     Hash: 95e8346df02f746479496a8cf8dff811
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 3a5ed69a696500724b1707c4bcc7774f
+    Hash: feb9da3aff92f8e1a5bb816685472ece
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -33,5 +33,5 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Solar System/Prefabs/Earth.prefab
+- Assets/Solar System/Prefabs/Mercury.prefab
 Dependencies: []

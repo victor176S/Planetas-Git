@@ -1,21 +1,50 @@
 using System.Collections;
-using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
+using TMPro;
 using Vuforia;
 
+//clase para leer el Json, con sus datos, cambiar las variables dependiendo de lo que haya en el Json
+public class metaDatos
+{
+
+    public string nombre;
+    public string puntuacion;
+    public string url;
+
+    public static metaDatos CreateFromJSON(string jsonString)
+    {
+        return JsonUtility.FromJson<metaDatos>(jsonString);
+    }
+
+}
+/*
+
+    Script que:
+        - Genera una opción aleatoriamente (planetas) y lo muestra en pantalla
+        - Reconoce imágenes del cloud y obtiene el nombre (TargetName)
+        - Comprueba si la imagen coincide con la mostrada en el texto
+
+
+
+*/
 public class SimpleCloudRecoEventHandler : MonoBehaviour
 {
     CloudRecoBehaviour mCloudRecoBehaviour;
     bool mIsScanning = false;
     string mTargetMetadata = "";
 
-    string URL;
+    //variable del tipo "metaDatos" de la clase de arriba del todo para que funcione en OnNewSearchResult
+    metaDatos metaDatosVuforia;
+    [SerializeField] TextMeshPro m_Object;
 
-    string nombreBundle;
 
     public ImageTargetBehaviour ImageTargetTemplate;
 
+    void Start()
+    {
+ 
+    }
     // Register cloud reco callbacks
     void Awake()
     {
@@ -35,8 +64,7 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
         mCloudRecoBehaviour.UnregisterOnStateChangedEventHandler(OnStateChanged);
         mCloudRecoBehaviour.UnregisterOnNewSearchResultEventHandler(OnNewSearchResult);
     }
-
-      public void OnInitialized(CloudRecoBehaviour cloudRecoBehaviour)
+     public void OnInitialized(CloudRecoBehaviour cloudRecoBehaviour)
     {
         Debug.Log("Cloud Reco initialized");
     }
@@ -51,8 +79,7 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
         Debug.Log("Cloud Reco update error " + updateError.ToString());
 
     }
-
-       public void OnStateChanged(bool scanning)
+     public void OnStateChanged(bool scanning)
     {
         mIsScanning = scanning;
 
@@ -61,79 +88,42 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
             // Clear all known targets
         }
     }
-
-     // Here we handle a cloud target recognition event
+      // Here we handle a cloud target recognition event
     public void OnNewSearchResult(CloudRecoBehaviour.CloudRecoSearchResult cloudRecoSearchResult )
     {
-
-        if (ImageTargetTemplate)
-        {
-        /* Enable the new result with the same ImageTargetBehaviour: */
-        mCloudRecoBehaviour.EnableObservers(cloudRecoSearchResult, ImageTargetTemplate.gameObject);
-        }
         // Store the target metadata
-        mTargetMetadata = cloudRecoSearchResult.MetaData;
+        mTargetMetadata = cloudRecoSearchResult.TargetName;
+
+        //viene de la clase "metaDatos" de arriba del todo, solo seria cambiar "metaDatos" y "MetaData" para adaptarlo a como lo quieras poner en
+        //la funcion de arriba del todo
+
+        metaDatosVuforia = metaDatos.CreateFromJSON(cloudRecoSearchResult.MetaData);
+
+        
+ 
 
         // Stop the scanning by disabling the behaviour
         mCloudRecoBehaviour.enabled = false;
     }
-
     void OnGUI() {
-    // Display current 'scanning' status
-    GUI.Box (new Rect(100,100,200,50), mIsScanning ? "Scanning" : "Not scanning");
-    // Display metadata of latest detected cloud-target
-    GUI.Box (new Rect(100,200,200,50), "Metadata: " + mTargetMetadata);
-    // If not scanning, show button
-    // so that user can restart cloud scanning
-    if (!mIsScanning) {
-        if (GUI.Button(new Rect(100,300,200,50), "Restart Scanning")) {
-        // Reset Behaviour
-        mCloudRecoBehaviour.enabled = true;
-        mTargetMetadata="";
-            }
-        }
-    }
+        //caja de texto 1 donde sale si está escaneando
 
-        IEnumerator FetchGameObjectFromServer(string url,string manifestFileName,uint crcR,Hash128 hashR)
-        {
-         
-            //Get from generated manifest file of assetbundle.
-            uint crcNumber = crcR;
-            //Get from generated manifest file of assetbundle.
-            Hash128 hashCode = hashR;
-             UnityWebRequest webrequest =
-                UnityWebRequestAssetBundle.GetAssetBundle(url, new CachedAssetBundle(manifestFileName, hashCode), crcNumber);
-    
-           
-            webrequest.SendWebRequest();
-    
-            while (!webrequest.isDone)
-            {
-              Debug.Log(webrequest.downloadProgress);  
-              
-            }
-        
-            AssetBundle assetBundle = DownloadHandlerAssetBundle.GetContent(webrequest);
-           yield return assetBundle;
-           if (assetBundle == null)
-                yield break;
-       
-      
-            //Gets name of all the assets in that assetBundle.
-            string[] allAssetNames = assetBundle.GetAllAssetNames();
-             Debug.Log(allAssetNames.Length +"objects inside prefab bundle");
-            foreach (string gameObjectsName in allAssetNames)
-            {
-                string gameObjectName = Path.GetFileNameWithoutExtension(gameObjectsName).ToString();
-                GameObject objectFound = assetBundle.LoadAsset(gameObjectName) as GameObject;
-                Instantiate(objectFound);
-            }
-            assetBundle.Unload(false);
-            yield return null;
-        }
+      // Display current 'scanning' status
+      GUI.Box (new Rect(100,100,200,50), mIsScanning ? "Scanning" : "Not scanning");
+      //caja de texto dos con el valor de url
 
-        void Start()
-        {
-            StartCoroutine(FetchGameObjectFromServer(URL,nombreBundle,0,new Hash128()));
-        }
+      // Display metadata of latest detected cloud-target
+      GUI.Box (new Rect(100,200,200,50), "Metadata: " + metaDatosVuforia.url);
+        //caja de texto donde sale para reiniciar el scan
+
+      // If not scanning, show button
+      // so that user can restart cloud scanning
+      if (!mIsScanning) {
+          if (GUI.Button(new Rect(100,300,200,50), "Restart Scanning")) {
+          // Reset Behaviour
+          mCloudRecoBehaviour.enabled = true;
+          mTargetMetadata="";
+          }
+      }
+  }
 }

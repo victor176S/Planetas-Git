@@ -1,9 +1,12 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.2.6f1
-CRC: 1789397594
+CRC: 3474654747
 HashAppended: 0
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
+      Name: mercurio
+      Dependencies: {}
+    Info_1:
       Name: tierra
       Dependencies: {}
