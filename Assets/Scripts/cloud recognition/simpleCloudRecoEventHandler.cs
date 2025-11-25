@@ -120,6 +120,8 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
 
         StartCoroutine(GetAssetBundle());
 
+        //ESTO ESTO FALTABA ESTE IF ESTA COSA
+
         if (ImageTargetTemplate)
         {
             mCloudRecoBehaviour.EnableObservers(cloudRecoSearchResult, ImageTargetTemplate.gameObject);
