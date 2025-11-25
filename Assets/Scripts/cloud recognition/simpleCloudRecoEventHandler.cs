@@ -5,6 +5,7 @@ using TMPro;
 using Vuforia;
 using UnityEngine.Networking;
 using System.IO;
+using Unity.VisualScripting;
 
 //clase para leer el Json, con sus datos, cambiar las variables dependiendo de lo que haya en el Json
 public class metaDatos
@@ -32,24 +33,26 @@ public class metaDatos
 */
 public class SimpleCloudRecoEventHandler : MonoBehaviour
 {
+
+    public static SimpleCloudRecoEventHandler instance;
+
     CloudRecoBehaviour mCloudRecoBehaviour;
     bool mIsScanning = false;
     string mTargetMetadata = "";
 
     //variable del tipo "metaDatos" de la clase de arriba del todo para que funcione en OnNewSearchResult
     metaDatos metaDatosVuforia;
-    [SerializeField] TextMeshPro m_Object;
-
+   
 
     public ImageTargetBehaviour ImageTargetTemplate;
 
-    void Start()
-    {
-        StartCoroutine(GetAssetBundle());
-    }
+
     // Register cloud reco callbacks
     void Awake()
     {
+
+        instance = this;
+
         mCloudRecoBehaviour = GetComponent<CloudRecoBehaviour>();
         mCloudRecoBehaviour.RegisterOnInitializedEventHandler(OnInitialized);
         mCloudRecoBehaviour.RegisterOnInitErrorEventHandler(OnInitError);
@@ -70,7 +73,7 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
             string[] allAssetNames = bundle.GetAllAssetNames();
             string gameObjectName = Path.GetFileNameWithoutExtension(allAssetNames[0]).ToString();
             GameObject objectFound = bundle.LoadAsset(gameObjectName) as GameObject;
-            Instantiate(objectFound,transform.position, transform.rotation);
+            Instantiate(objectFound,ImageTargetTemplate.gameObject.transform.position, ImageTargetTemplate.gameObject.transform.rotation);
             
         }
     }
@@ -130,7 +133,7 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
         // Stop the scanning by disabling the behaviour
         mCloudRecoBehaviour.enabled = false;
     }
-    void OnGUI() {
+   void OnGUI() {
         //caja de texto 1 donde sale si está escaneando
 
       // Display current 'scanning' status
