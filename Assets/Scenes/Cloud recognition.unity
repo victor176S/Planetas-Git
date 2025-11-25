@@ -489,6 +489,7 @@ GameObject:
   - component: {fileID: 1804773559}
   - component: {fileID: 1804773558}
   - component: {fileID: 1804773557}
+  - component: {fileID: 1804773561}
   m_Layer: 0
   m_Name: ImageTarget
   m_TagString: Untagged
@@ -601,6 +602,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1804773561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804773556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ccd3842f8945c34a80c23df00d02c58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimpleCloudRecoEventHandler
+  m_Object: {fileID: 0}
+  ImageTargetTemplate: {fileID: 1804773559}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

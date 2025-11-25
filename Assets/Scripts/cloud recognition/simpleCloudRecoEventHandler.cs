@@ -120,6 +120,11 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
 
         StartCoroutine(GetAssetBundle());
 
+        if (ImageTargetTemplate)
+        {
+            mCloudRecoBehaviour.EnableObservers(cloudRecoSearchResult, ImageTargetTemplate.gameObject);
+        }
+
         // Stop the scanning by disabling the behaviour
         mCloudRecoBehaviour.enabled = false;
     }
