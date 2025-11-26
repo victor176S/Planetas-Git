@@ -37,7 +37,7 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
     public static SimpleCloudRecoEventHandler instance;
 
     CloudRecoBehaviour mCloudRecoBehaviour;
-    bool mIsScanning = false;
+    bool mIsScanning = true;
     string mTargetMetadata = "";
 
     //variable del tipo "metaDatos" de la clase de arriba del todo para que funcione en OnNewSearchResult
@@ -45,6 +45,8 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
    
 
     public ImageTargetBehaviour ImageTargetTemplate;
+
+    public GameObject objeto;
 
 
     // Register cloud reco callbacks
@@ -73,7 +75,7 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
             string[] allAssetNames = bundle.GetAllAssetNames();
             string gameObjectName = Path.GetFileNameWithoutExtension(allAssetNames[0]).ToString();
             GameObject objectFound = bundle.LoadAsset(gameObjectName) as GameObject;
-            Instantiate(objectFound,ImageTargetTemplate.gameObject.transform.position, ImageTargetTemplate.gameObject.transform.rotation);
+            objeto = Instantiate(objectFound,ImageTargetTemplate.gameObject.transform.position, ImageTargetTemplate.gameObject.transform.rotation);
             
         }
     }
@@ -107,16 +109,19 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
 
         if (scanning)
         {
-            // Clear all known targets
+            Destroy(objeto);
         }
     }
       // Here we handle a cloud target recognition event
     public void OnNewSearchResult(CloudRecoBehaviour.CloudRecoSearchResult cloudRecoSearchResult )
     {
+
+
+
         // Store the target metadata
         mTargetMetadata = cloudRecoSearchResult.TargetName;
 
-        //viene de la clase "metaDatos" de arriba del todo, solo seria cambiar "metaDatos" y "MetaData" para adaptarlo a como lo quieras poner en
+        //viene de la clase "metaDatos" de arriba del todo, solo seria cambiar "metaDatos" para adaptarlo a como lo quieras poner en
         //la funcion de arriba del todo
 
         metaDatosVuforia = metaDatos.CreateFromJSON(cloudRecoSearchResult.MetaData);
@@ -148,9 +153,11 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
       // so that user can restart cloud scanning
       if (!mIsScanning) {
           if (GUI.Button(new Rect(100,300,200,50), "Restart Scanning")) {
+            //Destroy(ImageTargetTemplate.gameObject);
           // Reset Behaviour
           mCloudRecoBehaviour.enabled = true;
           mTargetMetadata="";
+            
           }
       }
   }
