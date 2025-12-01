@@ -9,8 +9,12 @@ public class PruebaRigidBody : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+
+        if (SimpleCloudRecoEventHandler.instance.objeto != null)
+        {
+            SimpleCloudRecoEventHandler.instance.objeto.transform.position += new Vector3 (0.02f, 0,0);
+        }  
     }
 }
