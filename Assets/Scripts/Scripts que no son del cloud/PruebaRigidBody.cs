@@ -1,8 +1,24 @@
+using TMPro;
 using UnityEngine;
 
 public class PruebaRigidBody : MonoBehaviour
 {
+
+    public static PruebaRigidBody instance;
+
+    public TextMeshProUGUI debugFixedUpd;
+
+    public TextMeshProUGUI debugIFUpd;
+
+    public bool instanciado;
+    public float speed;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    void Awake()
+    {
+        instance = this;
+    }
     void Start()
     {
         
@@ -12,9 +28,14 @@ public class PruebaRigidBody : MonoBehaviour
     void FixedUpdate()
     {
 
-        if (SimpleCloudRecoEventHandler.instance.objeto != null)
+        debugFixedUpd.text = "fixedupdate";
+
+        if (instanciado)
         {
-            SimpleCloudRecoEventHandler.instance.objeto.transform.position += new Vector3 (0.02f, 0,0);
+            debugIFUpd.text = "entra al if";
+
+            SimpleCloudRecoEventHandler.instance.objeto.transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            //SimpleCloudRecoEventHandler.instance.objeto.transform.Translate(0,0,0); 
         }  
     }
 }

@@ -6,6 +6,7 @@ using Vuforia;
 using UnityEngine.Networking;
 using System.IO;
 using Unity.VisualScripting;
+using UnityEngine.UI;
 
 //clase para leer el Json, con sus datos, cambiar las variables dependiendo de lo que haya en el Json
 public class metaDatos
@@ -33,6 +34,9 @@ public class metaDatos
 */
 public class SimpleCloudRecoEventHandler : MonoBehaviour
 {
+    public float speed;
+
+    public Button boton;
 
     public static SimpleCloudRecoEventHandler instance;
 
@@ -47,6 +51,9 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
     public ImageTargetBehaviour ImageTargetTemplate;
 
     public GameObject objeto;
+    public bool instanciado;
+
+    public GameObject objectFound;
 
 
     // Register cloud reco callbacks
@@ -61,6 +68,8 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
         mCloudRecoBehaviour.RegisterOnUpdateErrorEventHandler(OnUpdateError);
         mCloudRecoBehaviour.RegisterOnStateChangedEventHandler(OnStateChanged);
         mCloudRecoBehaviour.RegisterOnNewSearchResultEventHandler(OnNewSearchResult);
+
+        speed = 10f;
     }
 
     IEnumerator GetAssetBundle() {
@@ -74,9 +83,12 @@ public class SimpleCloudRecoEventHandler : MonoBehaviour
             AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
             string[] allAssetNames = bundle.GetAllAssetNames();
             string gameObjectName = Path.GetFileNameWithoutExtension(allAssetNames[0]).ToString();
-            GameObject objectFound = bundle.LoadAsset(gameObjectName) as GameObject;
+            objectFound = bundle.LoadAsset(gameObjectName) as GameObject;
             objeto = Instantiate(objectFound,ImageTargetTemplate.gameObject.transform.position, ImageTargetTemplate.gameObject.transform.rotation);
-            
+            if (boton.GetComponent<ButtonUtilities>().mover == true)
+            {
+                objeto.gameObject.transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }  
         }
     }
     //Unregister cloud reco callbacks when the handler is destroyed
